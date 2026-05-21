@@ -1,4 +1,4 @@
-import { getStore } from "@netlify/blobs";
+import { connectLambda, getStore } from "@netlify/blobs";
 
 const STORE_NAME = "jingling-schedule";
 const RECORDS_KEY = "records";
@@ -18,7 +18,7 @@ const bad = (message, statusCode = 400) => ok({ error: message }, statusCode);
 
 async function readRecords() {
   const store = openStore();
-  const records = await store.get(RECORDS_KEY, { type: "json", consistency: "strong" });
+  const records = await store.get(RECORDS_KEY, { type: "json" });
   return Array.isArray(records) ? records : [];
 }
 
@@ -28,13 +28,6 @@ async function writeRecords(records) {
 }
 
 function openStore() {
-  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
-  const token = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_API_TOKEN;
-
-  if (siteID && token) {
-    return getStore({ name: STORE_NAME, siteID, token });
-  }
-
   return getStore(STORE_NAME);
 }
 
@@ -67,6 +60,8 @@ function cleanRecord(input) {
 }
 
 export async function handler(event) {
+  connectLambda(event);
+
   if (event.httpMethod === "OPTIONS") {
     return ok({});
   }
