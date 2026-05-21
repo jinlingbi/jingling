@@ -17,14 +17,25 @@ const ok = (body, statusCode = 200) => ({
 const bad = (message, statusCode = 400) => ok({ error: message }, statusCode);
 
 async function readRecords() {
-  const store = getStore(STORE_NAME);
+  const store = openStore();
   const records = await store.get(RECORDS_KEY, { type: "json", consistency: "strong" });
   return Array.isArray(records) ? records : [];
 }
 
 async function writeRecords(records) {
-  const store = getStore(STORE_NAME);
+  const store = openStore();
   await store.setJSON(RECORDS_KEY, records, { metadata: { updatedAt: new Date().toISOString() } });
+}
+
+function openStore() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_API_TOKEN;
+
+  if (siteID && token) {
+    return getStore({ name: STORE_NAME, siteID, token });
+  }
+
+  return getStore(STORE_NAME);
 }
 
 function cleanRecord(input) {
