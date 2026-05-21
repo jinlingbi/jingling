@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>学员排课需求管理</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>学员排课需求管理</h1>
+        <p>多人填写，云端保存，按大洲汇总北京时间偏好</p>
+      </div>
+      <div class="sync" id="syncState">准备同步</div>
+    </header>
+
+    <main class="shell">
+      <nav class="tabs" aria-label="页面切换">
+        <button class="tab is-active" data-tab="form">填写需求</button>
+        <button class="tab" data-tab="summary">数据汇总</button>
+        <button class="tab" data-tab="analytics">统计分析</button>
+      </nav>
+
+      <section class="panel is-active" id="tab-form">
+        <form id="recordForm" class="form-grid">
+          <input type="hidden" name="id">
+          <label>
+            学生ID *
+            <input name="studentId" autocomplete="off" required placeholder="例如 S1024">
+          </label>
+          <label>
+            归属LP *
+            <input name="lp" autocomplete="off" required placeholder="例如 Alice">
+          </label>
+          <label>
+            归属大洲 *
+            <select name="continent" required>
+              <option value="">请选择</option>
+              <option>亚洲</option>
+              <option>北美洲</option>
+              <option>南美洲</option>
+              <option>欧洲</option>
+              <option>非洲</option>
+              <option>大洋洲</option>
+            </select>
+          </label>
+          <label>
+            上课语种 *
+            <select name="language" required>
+              <option value="">请选择</option>
+              <option>普通话</option>
+              <option>英文班</option>
+              <option>粤语班</option>
+            </select>
+          </label>
+          <label>
+            需求级别
+            <select name="level">
+              <option value="">请选择</option>
+              <option>S1</option><option>S2</option><option>S3</option>
+              <option>S4</option><option>S5</option><option>S6</option>
+              <option>S7</option><option>S8</option><option>S9</option>
+            </select>
+          </label>
+          <label>
+            家长期望上课北京时间1
+            <div class="inline-fields">
+              <select name="day1">
+                <option value="">周几</option>
+                <option>周一</option><option>周二</option><option>周三</option>
+                <option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+              </select>
+              <select name="time1" data-time-select>
+                <option value="">时间</option>
+              </select>
+            </div>
+          </label>
+          <label>
+            家长期望上课北京时间2
+            <div class="inline-fields">
+              <select name="day2">
+                <option value="">周几</option>
+                <option>周一</option><option>周二</option><option>周三</option>
+                <option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+              </select>
+              <select name="time2" data-time-select>
+                <option value="">时间</option>
+              </select>
+            </div>
+          </label>
+          <label>
+            学员现状态 *
+            <select name="status" required>
+              <option value="">请选择</option>
+              <option>停课</option>
+              <option>上课中</option>
+              <option>结课</option>
+              <option>退费</option>
+            </select>
+          </label>
+          <label class="wide">
+            备注
+            <textarea name="note" rows="3" placeholder="可填写特殊说明"></textarea>
+          </label>
+          <div class="actions wide">
+            <button class="primary" type="submit">提交记录</button>
+            <button type="button" id="resetForm">清空</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel" id="tab-summary">
+        <div class="toolbar">
+          <input id="searchBox" placeholder="搜索学生ID、LP、大洲、语种、状态">
+          <select id="continentFilter">
+            <option value="">全部大洲</option>
+            <option>亚洲</option><option>北美洲</option><option>南美洲</option>
+            <option>欧洲</option><option>非洲</option><option>大洋洲</option>
+          </select>
+          <button id="refreshData">刷新</button>
+          <button id="exportCsv">导出CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>学生ID</th><th>归属LP</th><th>大洲</th><th>语种</th><th>级别</th>
+                <th>时间1</th><th>时间2</th><th>状态</th><th>更新时间</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="recordRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-analytics">
+        <div class="metric-row" id="metricRow"></div>
+        <div class="analytics-grid">
+          <section class="block">
+            <h2>各大洲北京时间偏好</h2>
+            <div id="continentTimeStats"></div>
+          </section>
+          <section class="block">
+            <h2>高频北京时间</h2>
+            <div id="timeRank"></div>
+          </section>
+          <section class="block">
+            <h2>大洲人数分布</h2>
+            <div id="continentRank"></div>
+          </section>
+          <section class="block">
+            <h2>学员状态分布</h2>
+            <div id="statusRank"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast"></div>
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
