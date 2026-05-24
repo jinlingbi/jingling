@@ -22,8 +22,9 @@ const els = {
   continentTimeStats: document.getElementById("continentTimeStats"),
   timeRank: document.getElementById("timeRank"),
   continentRank: document.getElementById("continentRank"),
-  statusRank: document.getElementById("statusRank"),
-  toast: document.getElementById("toast")
+statusRank: document.getElementById("statusRank"),
+levelShare: document.getElementById("levelShare"),
+toast: document.getElementById("toast")
 };
 
 document.querySelectorAll("[data-time-select]").forEach((select) => {
