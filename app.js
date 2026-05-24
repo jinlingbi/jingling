@@ -22,9 +22,9 @@ const els = {
   continentTimeStats: document.getElementById("continentTimeStats"),
   timeRank: document.getElementById("timeRank"),
   continentRank: document.getElementById("continentRank"),
-statusRank: document.getElementById("statusRank"),
-levelShare: document.getElementById("levelShare"),
-toast: document.getElementById("toast")
+  statusRank: document.getElementById("statusRank"),
+  levelShare: document.getElementById("levelShare"),
+  toast: document.getElementById("toast")
 };
 
 document.querySelectorAll("[data-time-select]").forEach((select) => {
@@ -191,9 +191,9 @@ function renderAnalytics() {
 
   renderContinentTime();
   renderRank(els.timeRank, timeCount, "次");
-renderRank(els.continentRank, countBy(state.records, "continent"), "人");
-renderRank(els.statusRank, countBy(state.records, "status"), "人");
-renderShare(els.levelShare, countLevels(state.records), total);
+  renderRank(els.continentRank, countBy(state.records, "continent"), "人");
+  renderRank(els.statusRank, countBy(state.records, "status"), "人");
+  renderShare(els.levelShare, countLevels(state.records), total);
 }
 
 function renderContinentTime() {
@@ -226,7 +226,20 @@ function renderRank(container, data, unit) {
   if (!entries.length) {
     container.innerHTML = `<div class="empty">暂无数据</div>`;
     return;
-  }function renderShare(container, data, total) {
+  }
+  const max = Math.max(...entries.map((item) => item[1]), 1);
+  container.innerHTML = entries.map(([name, count]) => `
+    <div class="bar">
+      <div class="bar-name">${escapeHtml(name)}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${Math.max((count / max) * 100, 8)}%">${count}</div>
+      </div>
+      <div>${unit}</div>
+    </div>
+  `).join("");
+}
+
+function renderShare(container, data, total) {
   const entries = Object.entries(data).sort((a, b) => {
     const levelA = Number(a[0].replace("S", ""));
     const levelB = Number(b[0].replace("S", ""));
@@ -252,25 +265,6 @@ function renderRank(container, data, unit) {
       </div>
     `;
   }).join("");
-}
-
-function countLevels(records) {
-  return records.reduce((acc, item) => {
-    const value = item.level || "未填写";
-    acc[value] = (acc[value] || 0) + 1;
-    return acc;
-  }, {});
-}
-  const max = Math.max(...entries.map((item) => item[1]), 1);
-  container.innerHTML = entries.map(([name, count]) => `
-    <div class="bar">
-      <div class="bar-name">${escapeHtml(name)}</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${Math.max((count / max) * 100, 8)}%">${count}</div>
-      </div>
-      <div>${unit}</div>
-    </div>
-  `).join("");
 }
 
 function editRecord(id) {
@@ -302,6 +296,14 @@ function countBy(records, key) {
   return records.reduce((acc, item) => {
     const value = item[key];
     if (value) acc[value] = (acc[value] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function countLevels(records) {
+  return records.reduce((acc, item) => {
+    const value = item.level || "未填写";
+    acc[value] = (acc[value] || 0) + 1;
     return acc;
   }, {});
 }
