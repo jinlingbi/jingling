@@ -191,8 +191,9 @@ function renderAnalytics() {
 
   renderContinentTime();
   renderRank(els.timeRank, timeCount, "次");
-  renderRank(els.continentRank, countBy(state.records, "continent"), "人");
-  renderRank(els.statusRank, countBy(state.records, "status"), "人");
+renderRank(els.continentRank, countBy(state.records, "continent"), "人");
+renderRank(els.statusRank, countBy(state.records, "status"), "人");
+renderShare(els.levelShare, countLevels(state.records), total);
 }
 
 function renderContinentTime() {
@@ -225,7 +226,41 @@ function renderRank(container, data, unit) {
   if (!entries.length) {
     container.innerHTML = `<div class="empty">暂无数据</div>`;
     return;
+  }function renderShare(container, data, total) {
+  const entries = Object.entries(data).sort((a, b) => {
+    const levelA = Number(a[0].replace("S", ""));
+    const levelB = Number(b[0].replace("S", ""));
+    if (Number.isFinite(levelA) && Number.isFinite(levelB)) return levelA - levelB;
+    return b[1] - a[1] || a[0].localeCompare(b[0]);
+  });
+
+  if (!entries.length) {
+    container.innerHTML = `<div class="empty">暂无级别数据</div>`;
+    return;
   }
+
+  const max = Math.max(...entries.map((item) => item[1]), 1);
+  container.innerHTML = entries.map(([name, count]) => {
+    const pct = total ? Math.round((count / total) * 100) : 0;
+    return `
+      <div class="bar">
+        <div class="bar-name">${escapeHtml(name)}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${Math.max((count / max) * 100, 8)}%">${pct}%</div>
+        </div>
+        <div>${count}人</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function countLevels(records) {
+  return records.reduce((acc, item) => {
+    const value = item.level || "未填写";
+    acc[value] = (acc[value] || 0) + 1;
+    return acc;
+  }, {});
+}
   const max = Math.max(...entries.map((item) => item[1]), 1);
   container.innerHTML = entries.map(([name, count]) => `
     <div class="bar">
